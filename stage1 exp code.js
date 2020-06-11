@@ -15,6 +15,7 @@
   var landmarkPocJobNoList;
   var landmark_updateJob;
   var landmarkPocMRTList;
+  var landmarkSource;
   
   try{
   landmark_blacklist = [];
@@ -54,23 +55,31 @@
 
     var jobNo = joblistItem[i].dataset.jobNo;
 
-    if(jobNo){
-      if( typeof( landmarkPocJobNoList[jobNo] ) != 'undefined' ){
-        if( joblistItem[i].dataset.jobsource == 'hotjob_chr' || landmark_blacklist.indexOf(jobNo) != -1){
-          continue;
-        }
-        nearStation = landmarkPocMRTList [ landmarkPocJobNoList[jobNo][1] ];
-        nearStationDist = landmarkPocJobNoList[jobNo][0];
-        landmark_changelink = joblistItem[i].querySelectorAll('.js-job-link');
-        landmark_newJobsource = landmark_changelink[0].getAttribute('href').split('jobsource=')[0] + 'jobsource=landmarkPOC_';
-      }else{
+if(jobNo){
+  if( typeof( landmarkPocJobNoList[jobNo] ) != 'undefined'    ){
+    if( joblistItem[i].dataset.jobsource == 'hotjob_chr' || landmark_blacklist.indexOf(jobNo) != -1){
       continue;
     }
-    }else{
+    landmarkSource = 'MRT';
+    nearStation = landmarkPocMRTList [ landmarkPocJobNoList[jobNo][1] ];
+    nearStationDist = landmarkPocJobNoList[jobNo][0];
+    landmark_changelink = joblistItem[i].querySelectorAll('.js-job-link');
+    landmark_newJobsource = landmark_changelink[0].getAttribute('href').split('jobsource=')[0] + 'jobsource=landmarkPOC_';
+  }else if ( typeof( landmarkPocJobNoList_otherLandmark[jobNo] ) != 'undefined' ) {
+    if( joblistItem[i].dataset.jobsource == 'hotjob_chr' || landmark_blacklist.indexOf(jobNo) != -1){
       continue;
     }
+    landmarkSource = 'otherLandmark';
+    nearStation = landmarkPocMRTList [ landmarkPocJobNoList_otherLandmark[jobNo][1] ];
+    nearStationDist = landmarkPocJobNoList_otherLandmark[jobNo][0];
+    landmark_changelink = joblistItem[i].querySelectorAll('.js-job-link');
+    landmark_newJobsource = landmark_changelink[0].getAttribute('href').split('jobsource=')[0] + 'jobsource=landmarkPOC_';
+  }
+}else{
+  continue;
+}
 
-    switch (String(landmarkPocClassifier)){
+    switch (String(landmarkPocClassifier) + '-' + landmarkSource ){
       case "1" :
         landmarkNewTag = "( 距捷運" + nearStation + "站" + landmarkRound( nearStationDist ) + "公尺 )";
         var landmark_admin = joblistItem[i].getElementsByClassName('job-list-intro')[0].firstElementChild;
